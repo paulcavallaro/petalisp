@@ -1,5 +1,6 @@
 module Main (main) where
 import System.Environment
+import System.Console.Readline
 import Control.Monad
 import Text.ParserCombinators.Parsec hiding (spaces)
 
@@ -122,4 +123,15 @@ readExpr input = case parse parseExpr "lisp" input of
     Right val -> val
 
 main :: IO ()
-main = getArgs >>= print . eval . readExpr . head
+main = repl
+
+repl :: IO ()
+repl = do
+  maybeLine <- readline "% "
+  case maybeLine of
+    Nothing -> return ()
+    Just "exit" -> return ()
+    Just "quit" -> return ()
+    Just line -> do addHistory line
+                    print . eval . readExpr $ line
+                    repl
